@@ -5,10 +5,11 @@ using System.Globalization;
 
 public class FireON : MonoBehaviour
 {
-    string latestMessage;
+    string latestMessageSwitch;
+    string latestMessageFire;
     public GameObject fire;
     public float number;
-    public ParticleSystem fire1;
+    public GameObject fire1;
     // Start is called before the first frame update
     void Start()
     {
@@ -17,23 +18,41 @@ public class FireON : MonoBehaviour
     }
     void OnMessageArrived(string msg)
     {
-        Debug.Log("Message arrived: " + msg);
-        latestMessage = msg.Trim(); //remove new line character at end of string
+
+        string[] msgSplit = msg.Split(',');
+        Debug.Log("message " + msgSplit);
+        Debug.Log("Switch " + msgSplit[0]);
+        Debug.Log("Fire" + msgSplit[1]);
+
+        latestMessageSwitch = msgSplit[0].Trim();
+        latestMessageFire = msgSplit[1].Trim();
+
 
     }
+
+
+    void OnConnectionEvent(bool success)
+    {
+        if (success)
+            Debug.Log("Connection established");
+        else
+            Debug.Log("Connection attempt failed or disconnection detected");
+    }
+
     // Update is called once per frame
     void Update()
     {
-        number = float.Parse(latestMessage, CultureInfo.InvariantCulture.NumberFormat);
-        fire1.startLifetime = number;
-        if (latestMessage == "1")
-        {
-            fire.SetActive(false);
-        }
-        if (latestMessage == "0")
+        number = float.Parse(latestMessageFire, CultureInfo.InvariantCulture.NumberFormat);
+
+        fire1.ParticleSystem.startLifetime = number;
+
+        if (latestMessageSwitch == "1")
         {
             fire.SetActive(true);
         }
-
+        if (latestMessageSwitch == "0")
+        {
+            fire.SetActive(false);
+        }
     }
 }
